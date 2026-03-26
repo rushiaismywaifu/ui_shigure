@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創意 Scroll Snap 範例</title>
+    <style>
+        :root{
+            --white: rgba(255,255,255,.95);
+            --glass: rgba(255,255,255,.12);
+            --glass-border: rgba(255,255,255,.22);
+            --shadow: 0 20px 60px rgba(0,0,0,.20);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #0f172a;
+            color: #fff;
+            font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,.06);
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,.25);
+            border-radius: 999px;
+        }
+
+        section {
+            position: relative;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: clamp(24px, 5vw, 64px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            isolation: isolate;
+            color: #fff;
+        }
+
+        section::before,
+        section::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: .25;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            width: min(1120px, 100%);
+        }
+
+        .glass {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 28px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.18);
+            letter-spacing: .08em;
+            font-size: .86rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        h1, h2, h3, p {
+            margin: 0;
+        }
+
+        h1 {
+            font-size: clamp(2.8rem, 7vw, 5.8rem);
+            line-height: 1.02;
+            margin-top: 18px;
+            margin-bottom: 18px;
+            letter-spacing: -.03em;
+            text-shadow: 0 10px 30px rgba(0,0,0,.18);
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3.4rem);
+            line-height: 1.08;
+            margin-top: 14px;
+            margin-bottom: 14px;
+            letter-spacing: -.02em;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,.92);
+        }
+
+        .lead {
+            font-size: clamp(1rem, 1.6vw, 1.25rem);
+            max-width: 58ch;
+        }
+
+        .section-head {
+            margin-bottom: 28px;
+            max-width: 760px;
+        }
+
+        .section-head p {
+            max-width: 62ch;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 24px;
+            margin-bottom: 26px;
+        }
+
+        .pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.14);
+            border: 1px solid rgba(255,255,255,.18);
+            font-size: .95rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .mini-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .mini-card {
+            padding: 18px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform .25s ease, background .25s ease;
+        }
+
+        .mini-card:hover,
+        .product-card:hover,
+        .quote-card:hover,
+        .contact-card:hover {
+            transform: translateY(-6px);
+            background: rgba(255,255,255,.16);
+        }
+
+        .mini-card .num {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+            opacity: .95;
+        }
+
+        .mini-card .label {
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .mini-card .desc {
+            font-size: .95rem;
+            line-height: 1.6;
+            opacity: .9;
+            margin-top: 8px;
+        }
+
+        .feature-panel {
+            position: relative;
+            padding: 28px;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 18px;
+            overflow: hidden;
+        }
+
+        .feature-panel::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            right: -60px;
+            top: -60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,.35), rgba(255,255,255,0) 70%);
+            opacity: .9;
+            pointer-events: none;
+        }
+
+        .feature-panel .quote {
+            font-size: clamp(1.2rem, 2vw, 1.65rem);
+            line-height: 1.5;
+            font-weight: 700;
+            max-width: 14ch;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .metric {
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.16);
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 2rem;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .metric span {
+            color: rgba(255,255,255,.88);
+            font-size: .92rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .product-card {
+            padding: 24px;
+            min-height: 340px;
+            transition: transform .25s ease, background .25s ease;
+        }
+
+        .icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            font-size: 1.6rem;
+            background: rgba(255,255,255,.14);
+            border: 1px solid rgba(255,255,255,.18);
+            margin-bottom: 16px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 18px 0 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: .98rem;
+            line-height: 1.6;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            font-weight: 800;
+            color: #fff7b2;
+            flex: 0 0 auto;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .tag {
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.16);
+            font-size: .86rem;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .quote-card {
+            padding: 24px;
+            transition: transform .25s ease, background .25s ease;
+        }
+
+        .quote-card.featured {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 420px;
+        }
+
+        .stars {
+            color: #ffe08a;
+            letter-spacing: 2px;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+
+        .quote-text {
+            font-size: clamp(1.2rem, 2vw, 1.7rem);
+            line-height: 1.6;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .author {
+            margin-top: auto;
+            opacity: .95;
+            font-weight: 700;
+        }
+
+        .testimonial-side {
+            display: grid;
+            gap: 18px;
+        }
+
+        .quote-card.small {
+            min-height: 160px;
+        }
+
+        .stats-box {
+            padding: 24px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.16);
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .stat span {
+            font-size: .92rem;
+            color: rgba(255,255,255,.88);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: .95fr 1.05fr;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .contact-card {
+            padding: 26px;
+            transition: transform .25s ease, background .25s ease;
+        }
+
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 18px 0 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .contact-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .contact-list a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(255,255,255,.45);
+        }
+
+        .contact-list a:hover {
+            opacity: .9;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .step {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.16);
+        }
+
+        .step strong {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .step p {
+            font-size: .94rem;
+            line-height: 1.5;
+        }
+
+        .cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 800;
+            transition: transform .25s ease, opacity .25s ease, background .25s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #0f172a;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.18);
+            color: #fff;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            font-size: .92rem;
+            opacity: .85;
+        }
+
+        /* 各頁背景 */
+        .page1 {
+            background:
+                radial-gradient(circle at top right, rgba(255,255,255,.22), transparent 28%),
+                radial-gradient(circle at bottom left, rgba(255,255,255,.15), transparent 22%),
+                linear-gradient(135deg, #ff6b6b 0%, #845ec2 55%, #2c73d2 100%);
+        }
+
+        .page2 {
+            background:
+                radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(255,255,255,.12), transparent 24%),
+                linear-gradient(135deg, #0f766e 0%, #06b6d4 50%, #38bdf8 100%);
+        }
+
+        .page3 {
+            background:
+                radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 28%),
+                radial-gradient(circle at bottom left, rgba(255,255,255,.13), transparent 24%),
+                linear-gradient(135deg, #312e81 0%, #7c3aed 52%, #ec4899 100%);
+        }
+
+        .page4 {
+            background:
+                radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(255,255,255,.12), transparent 24%),
+                linear-gradient(135deg, #14532d 0%, #16a34a 55%, #22c55e 100%);
+        }
+
+        /* 各頁裝飾球 */
+        .page1::before {
+            width: 360px;
+            height: 360px;
+            top: -90px;
+            right: -90px;
+            background: rgba(255,255,255,.18);
+        }
+
+        .page1::after {
+            width: 220px;
+            height: 220px;
+            bottom: -70px;
+            left: -50px;
+            background: rgba(255,255,255,.12);
+        }
+
+        .page2::before {
+            width: 320px;
+            height: 320px;
+            top: -80px;
+            left: -70px;
+            background: rgba(255,255,255,.14);
+        }
+
+        .page2::after {
+            width: 260px;
+            height: 260px;
+            bottom: -90px;
+            right: -60px;
+            background: rgba(255,255,255,.10);
+        }
+
+        .page3::before {
+            width: 340px;
+            height: 340px;
+            top: -80px;
+            right: -80px;
+            background: rgba(255,255,255,.14);
+        }
+
+        .page3::after {
+            width: 240px;
+            height: 240px;
+            bottom: -70px;
+            left: -60px;
+            background: rgba(255,255,255,.10);
+        }
+
+        .page4::before {
+            width: 320px;
+            height: 320px;
+            top: -90px;
+            left: -80px;
+            background: rgba(255,255,255,.14);
+        }
+
+        .page4::after {
+            width: 260px;
+            height: 260px;
+            bottom: -90px;
+            right: -60px;
+            background: rgba(255,255,255,.10);
+        }
+
+        /* 右側快速導覽 */
+        .quick-nav {
+            position: fixed;
+            top: 50%;
+            right: 18px;
+            transform: translateY(-50%);
+            z-index: 20;
+            display: grid;
+            gap: 10px;
+        }
+
+        .quick-nav button {
+            width: 46px;
+            height: 46px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.25);
+            background: rgba(15,23,42,.28);
+            color: #fff;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            cursor: pointer;
+            font-weight: 800;
+            transition: transform .25s ease, background .25s ease, color .25s ease;
+        }
+
+        .quick-nav button:hover,
+        .quick-nav button.active {
+            background: rgba(255,255,255,.92);
+            color: #0f172a;
+            transform: translateX(-4px);
+        }
+
+        /* 動畫 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @media (max-width: 980px) {
+            .hero-grid,
+            .product-grid,
+            .testimonial-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mini-row,
+            .stats-row,
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-panel,
+            .quote-card.featured {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .quick-nav {
+                top: auto;
+                bottom: 14px;
+                right: 50%;
+                transform: translateX(50%);
+                grid-auto-flow: column;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+
+            .quick-nav button {
+                width: 42px;
+                height: 42px;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 12vw, 4rem);
+            }
+
+            h2 {
+                font-size: clamp(1.8rem, 8vw, 2.6rem);
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="quick-nav" aria-label="頁面導覽">
+        <button data-target="page1" class="active" title="第一頁">01</button>
+        <button data-target="page2" title="第二頁">02</button>
+        <button data-target="page3" title="第三頁">03</button>
+        <button data-target="page4" title="第四頁">04</button>
+    </nav>
+
+    <main class="container">
+        <!-- 第一頁：品牌故事 -->
+        <section id="page1" class="page1">
+            <div class="content hero-grid">
+                <div>
+                    <div class="eyebrow">Brand Story / 品牌故事</div>
+                    <h1>把每一次滑動，變成一場靈感旅程</h1>
+                    <p class="lead">
+                        我們相信，網站不只是資訊的容器，而是品牌與使用者相遇的舞台。
+                        透過視覺節奏、清楚層次與情境故事，讓第一眼就留下印象。
+                    </p>
+
+                    <div class="pill-row">
+                        <span class="pill">✨ 視覺敘事</span>
+                        <span class="pill">⚡ 快速理解</span>
+                        <span class="pill">🎯 轉換導向</span>
+                    </div>
+
+                    <div class="mini-row">
+                        <div class="mini-card glass float">
+                            <div class="num">01</div>
+                            <div class="label">設定品牌語氣</div>
+                            <div class="desc">先讓使用者感受到你是誰，再讓他知道你能提供什麼。</div>
+                        </div>
+
+                        <div class="mini-card glass float">
+                            <div class="num">02</div>
+                            <div class="label">建立視覺焦點</div>
+                            <div class="desc">用大標題、留白與色彩，形成一個好記的第一印象。</div>
+                        </div>
+
+                        <div class="mini-card glass float">
+                            <div class="num">03</div>
+                            <div class="label">引導下一步</div>
+                            <div class="desc">讓使用者自然往下滑，進入產品、口碑與聯絡行動。</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-panel glass float">
+                    <div>
+                        <div class="eyebrow">Signature / 視覺亮點</div>
+                        <h3 style="margin-top:14px;">用色彩、節奏與留白，讓內容自然發光</h3>
+                        <p style="margin-top:10px;">
+                            這一頁像品牌的開場白：先吸引注意，再說出故事。
+                            使用圓潤卡片與柔和光暈，讓整體更有溫度。
+                        </p>
+                    </div>
+
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <strong>+120%</strong>
+                            <span>停留時間提升</span>
+                        </div>
+                        <div class="metric">
+                            <strong>4s</strong>
+                            <span>快速建立印象</span>
+                        </div>
+                        <div class="metric">
+                            <strong>3</strong>
+                            <span>核心故事節點</span>
+                        </div>
+                        <div class="metric">
+                            <strong>∞</strong>
+                            <span>延伸創意空間</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二頁：核心產品 -->
+        <section id="page2" class="page2">
+            <div class="content">
+                <div class="section-head">
+                    <div class="eyebrow">Core Products / 核心產品</div>
+                    <h2>三種方案，讓品牌從想法走到落地</h2>
+                    <p>
+                        從首頁、活動頁到產品頁，我們把視覺與內容一起設計，
+                        讓每一個頁面都有自己的任務與亮點。
+                    </p>
+                </div>
+
+                <div class="product-grid">
+                    <article class="product-card glass float">
+                        <div class="icon">🧩</div>
+                        <h3>品牌官網</h3>
+                        <p>適合建立完整形象，讓品牌故事、服務內容與聯絡資訊一次到位。</p>
+                        <ul class="feature-list">
+                            <li>RWD 響應式版型</li>
+                            <li>清楚的資訊層級</li>
+                            <li>適合品牌形象建立</li>
+                        </ul>
+                        <div class="tag-row">
+                            <span class="tag">首頁</span>
+                            <span class="tag">關於我們</span>
+                            <span class="tag">服務介紹</span>
+                        </div>
+                    </article>
+
+                    <article class="product-card glass float">
+                        <div class="icon">🚀</div>
+                        <h3>活動 / Landing Page</h3>
+                        <p>用強烈的視覺焦點與明確 CTA，提升轉換與報名效率。</p>
+                        <ul class="feature-list">
+                            <li>高對比主視覺</li>
+                            <li>行動呼籲明確</li>
+                            <li>適合短期活動推廣</li>
+                        </ul>
+                        <div class="tag-row">
+                            <span class="tag">報名</span>
+                            <span class="tag">倒數計時</span>
+                            <span class="tag">優惠活動</span>
+                        </div>
+                    </article>
+
+                    <article class="product-card glass float">
+                        <div class="icon">🛍️</div>
+                        <h3>產品展示頁</h3>
+                        <p>讓產品優點一眼可見，搭配情境圖與重點條列，強化購買意願。</p>
+                        <ul class="feature-list">
+                            <li>特色亮點卡片</li>
+                            <li>產品規格整理</li>
+                            <li>購買與詢問入口</li>
+                        </ul>
+                        <div class="tag-row">
+                            <span class="tag">產品介紹</span>
+                            <span class="tag">規格比較</span>
+                            <span class="tag">立即詢價</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第三頁：使用者見證 -->
+        <section id="page3" class="page3">
+            <div class="content">
+                <div class="section-head">
+                    <div class="eyebrow">User Voices / 使用者見證</div>
+                    <h2>真實回饋，讓信任被看見</h2>
+                    <p>
+                        不是只有漂亮，而是讓人願意停留、理解，並採取行動。
+                        真實使用者的回饋，往往比任何宣傳都更有力量。
+                    </p>
+                </div>
+
+                <div class="testimonial-grid">
+                    <article class="quote-card featured glass float">
+                        <div>
+                            <div class="stars">★★★★★</div>
+                            <div class="quote-text">
+                                「改版後，網站看起來更專業，
+                                客戶也更容易理解我們的服務，
+                                諮詢量真的明顯增加了。」
+                            </div>
+                        </div>
+                        <div class="author">— Alex / 品牌經理</div>
+                    </article>
+
+                    <div class="testimonial-side">
+                        <article class="quote-card small glass float">
+                            <div class="stars">★★★★★</div>
+                            <p>
+                                「版面很有節奏感，重點一目了然，
+                                使用者回饋也變得更正向。」
+                            </p>
+                            <div class="author" style="margin-top:14px;">— Mia / 行銷企劃</div>
+                        </article>
+
+                        <article class="quote-card small glass float">
+                            <div class="stars">★★★★★</div>
+                            <p>
+                                「從故事到行動按鈕都設計得很順，
+                                讓人想一直往下看。」
+                            </p>
+                            <div class="author" style="margin-top:14px;">— Kevin / 產品負責人</div>
+                        </article>
+
+                        <div class="stats-box glass">
+                            <div class="eyebrow">Impact / 成效數據</div>
+                            <div class="stats-row">
+                                <div class="stat">
+                                    <strong>98%</strong>
+                                    <span>滿意度</span>
+                                </div>
+                                <div class="stat">
+                                    <strong>2.3x</strong>
+                                    <span>平均停留時間</span>
+                                </div>
+                                <div class="stat">
+                                    <strong>+41%</strong>
+                                    <span>詢問量提升</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第四頁：立即聯絡 -->
+        <section id="page4" class="page4">
+            <div class="content contact-grid">
+                <div class="contact-card glass float">
+                    <div class="eyebrow">Contact / 立即聯絡</div>
+                    <h2>準備好一起把想法做成作品了嗎？</h2>
+                    <p style="margin-top:10px;">
+                        如果你有品牌改版、活動頁面、電商首頁，
+                        或任何需要更有故事性的網頁，我都很樂意幫你規劃。
+                    </p>
+
+                    <div class="cta-row">
+                        <a class="btn btn-primary" href="mailto:hello@example.com">📩 立即發信</a>
+                        <a class="btn btn-secondary" href="tel:+886212345678">📞 直接來電</a>
+                    </div>
+
+                    <div class="steps">
+                        <div class="step">
+                            <strong>1</strong>
+                            <p>告訴我們你的目標與需求。</p>
+                        </div>
+                        <div class="step">
+                            <strong>2</strong>
+                            <p>我們提出結構與視覺方向。</p>
+                        </div>
+                        <div class="step">
+                            <strong>3</strong>
+                            <p>開始打造專屬你的頁面風格。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-card glass float">
+                    <div class="eyebrow">Information / 聯絡資訊</div>
+                    <h3 style="margin-top:14px;">讓溝通更快，合作更順</h3>
+                    <ul class="contact-list">
+                        <li>📧 <a href="mailto:hello@example.com">hello@example.com</a></li>
+                        <li>📱 <a href="tel:+886212345678">02-1234-5678</a></li>
+                        <li>🕒 週一至週五 09:00–18:00</li>
+                        <li>📍 台北市信義區創意大道 88 號</li>
+                    </ul>
+
+                    <p class="footer-note">
+                        感謝你的時間，讓我們一起把內容變成有記憶點的體驗。
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const container = document.querySelector('.container');
+        const sections = document.querySelectorAll('section');
+        const navButtons = document.querySelectorAll('.quick-nav button');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const target = document.getElementById(button.dataset.target);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navButtons.forEach(button => {
+                        button.classList.toggle('active', button.dataset.target === entry.target.id);
+                    });
+                }
+            });
+        }, {
+            root: container,
+            threshold: 0.6
+        });
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>
